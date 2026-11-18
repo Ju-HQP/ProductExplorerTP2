@@ -26,6 +26,7 @@ import java.util.function.IntConsumer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -80,10 +81,29 @@ class MainActivity : ComponentActivity() {
                 rating = product.rating,
                 modifier = Modifier.padding(top = 16.dp)
             )
-            Text(text = product.description)
-            Button(onClick = onAddToCartClick) {
-                Text(text = "Ajouter au panier")
-            }
+            ProductAvailabilityCard(
+                stock = product.stock,
+                shippingInformation = product.shippingInformation,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp)
+            )
+            ProductDescription(
+                description = product.description,
+                modifier = Modifier.padding(top = 16.dp)
+            )
+            ProductWarrantyField(
+                warrantyInformation = product.warrantyInformation,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp)
+            )
+            AddToCartButton(
+                    onClick = onAddToCartClick,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp)
+            )
         }
     }
 
@@ -151,14 +171,97 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    // PREVIEWS
+    @Composable
+    fun ProductAvailabilityCard(
+        stock: Int,
+        shippingInformation: String,
+        modifier: Modifier = Modifier
+    ) {
+        Card(modifier = modifier) {
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Text(
+                    text = "Disponibilité",
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Text(
+                    text = "Stock : $stock unités",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    text = shippingInformation,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        }
+    }
 
+    @Composable
+    fun ProductDescription(
+        description: String,
+        modifier: Modifier = Modifier
+    ){
+        Column(modifier = modifier) {
+            Text(
+                text = "Description",
+                style = MaterialTheme.typography.titleMedium
+            )
+            Text(
+                text = description,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+        }
+    }
+
+    @Composable
+    fun ProductWarrantyField(
+        warrantyInformation: String,
+        modifier: Modifier = Modifier
+    ) {
+        OutlinedTextField(
+            value = warrantyInformation,
+            onValueChange = {},
+            readOnly = true,
+            label = {
+                Text(text = "Garantie")
+            },
+            modifier = modifier
+        )
+    }
+
+    @Composable
+    fun AddToCartButton(
+        onClick: () -> Unit,
+        modifier: Modifier = Modifier
+    ) {
+        Button(
+            onClick = onClick,
+            modifier = modifier
+        ) {
+            Text(text = "Ajouter au panier")
+        }
+    }
+
+    // PREVIEWS
     @Preview(showBackground = true)
     @Composable
     fun ProductDetailScreenPreview() {
         ProductExplorerTheme {
             ProductDetailScreen(
                 product = sampleProduct(), // produit d'ex déclaré plus bas
+                onAddToCartClick = {}
+            )
+        }
+    }
+
+    @Preview(showBackground = true)
+    @Composable
+    fun ProductDetailScreenOutOfStockPreview() {
+        ProductExplorerTheme {
+            ProductDetailScreen(
+                product = sampleProductOutOfStock(),
                 onAddToCartClick = {}
             )
         }
@@ -195,5 +298,21 @@ fun sampleProduct(): ProductUi {
         stock = 34,
         warrantyInformation = "Garantie constructeur : 2 ans",
         shippingInformation = "Livraison estimée : 3 à 5 jours ouvrés"
+    )
+}
+// product hors stock example
+fun sampleProductOutOfStock(): ProductUi {
+    return ProductUi(
+        title = "Casque Audio Pulse",
+        brand = "SoundPeak",
+        category = "Audio",
+        description = "Un casque confortable conçu pour écouter de la musique, " +
+                "suivre des cours en ligne et travailler dans de bonnes conditions.",
+        price = 129.99,
+        discountPercentage = 8.0,
+        rating = 4.2,
+        stock = 0,
+        warrantyInformation = "Garantie constructeur : 1 an",
+        shippingInformation = "Produit temporairement indisponible"
     )
 }
