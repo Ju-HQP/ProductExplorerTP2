@@ -7,8 +7,10 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -27,6 +29,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.produceState
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,10 +39,17 @@ class MainActivity : ComponentActivity() {
         setContent {
             ProductExplorerTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    ProductDetailScreen(
-                        product = sampleProduct(),
-                        onAddToCartClick = {
-// Action à ajouter plus tard
+//                    ProductDetailScreen(
+//                        product = sampleProduct(),
+//                        onAddToCartClick = {
+//// Action à ajouter plus tard
+//                        },
+//                        modifier = Modifier.padding(innerPadding)
+//                    )
+                    ProductHomeScreen(
+                        featuredProduct = sampleProduct(),
+                        onFeaturedProductClick = {
+                            // pour ouvrir le détail d'un produit au click
                         },
                         modifier = Modifier.padding(innerPadding)
                     )
@@ -48,6 +59,94 @@ class MainActivity : ComponentActivity() {
     }
 
     // écran entier
+    @Composable
+    fun ProductHomeScreen(
+        featuredProduct: ProductUi,
+        onFeaturedProductClick: () -> Unit,
+        modifier: Modifier = Modifier
+    ) {
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
+            HomeHeader()
+            Spacer(modifier = Modifier.height(24.dp))
+            SearchPreviewBar()
+            Spacer(modifier = Modifier.height(24.dp))
+            FeaturedProductSection(
+                product = featuredProduct,
+                onClick = onFeaturedProductClick
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+        }
+    }
+
+    @Composable
+    fun HomeHeader(
+        modifier: Modifier = Modifier
+    ) {
+        Column(modifier = modifier) {
+            Text(
+                text = "Product Explorer",
+                style = MaterialTheme.typography.headlineMedium
+            )
+            Text(
+                text = "Découvrez les produits du moment",
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+    }
+
+    @Composable
+    fun SearchPreviewBar(
+        modifier: Modifier = Modifier
+    ) {
+        Surface(
+            modifier = modifier.fillMaxWidth(),
+            shape = MaterialTheme.shapes.medium,
+            tonalElevation = 2.dp
+        ) {
+            Text(
+                text = "Rechercher un produit...",
+                modifier = Modifier.padding(16.dp),
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+    }
+
+    @Composable
+    fun FeaturedProductSection(
+        product: ProductUi,
+        onClick: () -> Unit,
+        modifier: Modifier = Modifier
+    ) {
+        Surface(
+            modifier = modifier.fillMaxWidth(),
+            shape = MaterialTheme.shapes.large,
+            tonalElevation = 4.dp
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Text(
+                    text = "Produit mis en avant",
+                    style = MaterialTheme.typography.titleMedium,
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = product.brand,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                Button(onClick = onClick) {
+                    Text(text = "Voir le produit")
+                }
+            }
+        }
+    }
+
+    // Page de détail du produit
     @Composable
     fun ProductDetailScreen(
         product: ProductUi,
@@ -99,10 +198,10 @@ class MainActivity : ComponentActivity() {
                     .padding(top = 16.dp)
             )
             AddToCartButton(
-                    onClick = onAddToCartClick,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp)
+                onClick = onAddToCartClick,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp)
             )
         }
     }
@@ -156,10 +255,10 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun ProductRating(
-        rating : Double,
-        modifier : Modifier = Modifier
-    ){
-        Row(modifier = modifier){
+        rating: Double,
+        modifier: Modifier = Modifier
+    ) {
+        Row(modifier = modifier) {
             Icon(
                 imageVector = Icons.Default.Star,
                 contentDescription = "Note du produit"
@@ -201,7 +300,7 @@ class MainActivity : ComponentActivity() {
     fun ProductDescription(
         description: String,
         modifier: Modifier = Modifier
-    ){
+    ) {
         Column(modifier = modifier) {
             Text(
                 text = "Description",
@@ -245,6 +344,18 @@ class MainActivity : ComponentActivity() {
     }
 
     // PREVIEWS
+
+    @Preview(showBackground = true)
+    @Composable
+    fun ProductHomeScreenPreview() {
+        ProductExplorerTheme {
+            ProductHomeScreen(
+                featuredProduct = sampleProduct(),
+                onFeaturedProductClick = {}
+            )
+        }
+    }
+
     @Preview(showBackground = true)
     @Composable
     fun ProductDetailScreenPreview() {
@@ -300,6 +411,7 @@ fun sampleProduct(): ProductUi {
         shippingInformation = "Livraison estimée : 3 à 5 jours ouvrés"
     )
 }
+
 // product hors stock example
 fun sampleProductOutOfStock(): ProductUi {
     return ProductUi(
