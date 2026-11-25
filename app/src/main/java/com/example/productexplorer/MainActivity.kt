@@ -139,6 +139,12 @@ class MainActivity : ComponentActivity() {
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Spacer(modifier = Modifier.height(12.dp))
+                ProductQuickInfoRow(
+                    price = product.price,
+                    rating = product.rating,
+                    stock = product.stock
+                )
+                Spacer(modifier = Modifier.height(12.dp))
                 Button(onClick = onClick) {
                     Text(text = "Voir le produit")
                 }
@@ -146,7 +152,51 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    // Page de détail du produit
+    // Ligne Resumé pour les infos produit
+    @Composable
+    fun ProductQuickInfoRow(
+        price: Double,
+        rating: Double,
+        stock: Int,
+        modifier: Modifier = Modifier
+    ) {
+        // weight(1f) répartie le contenu sur la largeur
+        Row(modifier = modifier.fillMaxWidth()) {
+            Text(
+                text = "$price €",
+                modifier = Modifier.weight(1f)
+            )
+            Text(
+                text = "★ $rating",
+                modifier = Modifier.weight(1f)
+            )
+            Text(
+                text = "$stock en stock",
+                modifier = Modifier.weight(1f)
+            )
+        }
+    }
+
+    // Composant Catégorie
+    @Composable
+    fun CategoryChip(
+        label: String,
+        modifier: Modifier = Modifier
+    ) {
+        Surface(
+            modifier = modifier,
+            shape = MaterialTheme.shapes.medium,
+            tonalElevation = 2.dp
+        ) {
+            Text(
+                text = label,
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+    }
+
+        // Page de détail du produit
     @Composable
     fun ProductDetailScreen(
         product: ProductUi,
