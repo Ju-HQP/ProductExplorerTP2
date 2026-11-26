@@ -623,10 +623,42 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    @Preview(showBackground = true)
+    // preview de base
+    /*@Preview(showBackground = true)
     @Composable
     fun ProductCatalogScreenPreview() {
         ProductExplorerTheme {
+            ProductCatalogScreen(
+                products = sampleProducts(),
+                onProductClick = {}
+            )
+        }
+    }*/
+    
+    // PREVIEW LIGHT MODE
+    @Preview(
+        showBackground = true,
+        name = "Catalogue - Light Theme"
+    )
+    @Composable
+    fun ProductCatalogScreenLightPreview() {
+        ProductExplorerTheme(darkTheme = false) {
+            ProductCatalogScreen(
+                products = sampleProducts(),
+                onProductClick = {}
+            )
+        }
+    }
+
+    // PREVIEW DARK MODE
+
+    @Preview(
+        showBackground = true,
+        name = "Catalogue - Dark Theme"
+    )
+    @Composable
+    fun ProductCatalogScreenDarkPreview() {
+        ProductExplorerTheme(darkTheme = true) {
             ProductCatalogScreen(
                 products = sampleProducts(),
                 onProductClick = {}
