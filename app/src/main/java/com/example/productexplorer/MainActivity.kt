@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -31,6 +32,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.produceState
+import androidx.compose.ui.Alignment
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -81,6 +83,7 @@ class MainActivity : ComponentActivity() {
             Spacer(modifier = Modifier.height(24.dp))
             CategoriesSection()
             Spacer(modifier = Modifier.height(24.dp))
+            DailyOfferBox()
         }
     }
 
@@ -218,8 +221,49 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+// Offre du jour page d'accueil
+    @Composable
+    fun DailyOfferBox(
+        modifier: Modifier = Modifier
+    ) {
+        Box(
+            modifier = modifier.fillMaxWidth()
+        ) {
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = MaterialTheme.shapes.large,
+                tonalElevation = 2.dp
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(
+                        text = "Offre du jour",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Text(
+                        text = "Jusqu’à -20 % sur une sélection de produits",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+            Surface(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(8.dp),
+                shape = MaterialTheme.shapes.small,
+                tonalElevation = 6.dp
+            ) {
+                Text(
+                    text = "Nouveau",
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                    style = MaterialTheme.typography.labelMedium
+                )
+            }
+        }
+    }
 
-        // Page de détail du produit
+    // Page de détail du produit -----------------------
     @Composable
     fun ProductDetailScreen(
         product: ProductUi,
