@@ -5,14 +5,18 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
@@ -33,6 +37,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
+import androidx.compose.foundation.lazy.items // corrige l'erruer no value passed for parameter count
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,10 +53,17 @@ class MainActivity : ComponentActivity() {
 //                        },
 //                        modifier = Modifier.padding(innerPadding)
 //                    )
-                    ProductHomeScreen(
-                        featuredProduct = sampleProduct(),
-                        onFeaturedProductClick = {
-                            // pour ouvrir le détail d'un produit au click
+//                    ProductHomeScreen(
+//                        featuredProduct = sampleProduct(),
+//                        onFeaturedProductClick = {
+//                            // pour ouvrir le détail d'un produit au click
+//                        },
+//                        modifier = Modifier.padding(innerPadding)
+//                    )
+                    ProductCatalogScreen(
+                        products = sampleProducts(),// liste de produits
+                        onProductClick = {
+// Plus tard : ouvrir le détail du produit
                         },
                         modifier = Modifier.padding(innerPadding)
                     )
@@ -60,7 +72,96 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    // écran entier
+    // CATALOGUE ---------------
+
+    // écran de catalogue
+    @Composable
+    fun ProductCatalogScreen(
+        products: List<ProductUi>,
+        onProductClick: (ProductUi) -> Unit,
+        modifier: Modifier = Modifier
+    ) {
+        LazyColumn(
+            modifier = modifier.fillMaxSize(),
+            contentPadding = PaddingValues(16.dp),
+            // Ajoute une marge intérieure autour du contenu de la liste
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+            // Ajoute un espace vertical entre les éléments de la liste.
+        ) {
+            item {
+                Text(
+                    text = "Catalogue produits",
+                    style = MaterialTheme.typography.headlineMedium
+                )
+            }
+            items(
+                items = products,
+                key = { product -> product.id }
+            ) { product ->
+                ProductListItem(
+                    product = product,
+                    onClick = {
+                        onProductClick(product)
+                    }
+                )
+            }
+        }
+    }
+
+    // carte produit réutilisable pour le catalogue
+    @Composable
+    fun ProductListItem(
+        product: ProductUi,
+        onClick: () -> Unit,
+        modifier: Modifier = Modifier
+    ) {
+        Card(modifier = modifier.fillMaxWidth()) {
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Text(
+                    text = product.title,
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Text(
+                    text = product.brand,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "${product.price} € • ★ ${product.rating}",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Button(onClick = onClick) {
+                    Text(text = "Voir le produit")
+                }
+            }
+        }
+    }
+
+    // affichage catégorie dans le catalogue
+    fun sampleCategories(): List<String> {
+        return listOf("Smartphones", "Audio", "Wearables", "Maison")
+    }
+
+    @Composable
+    fun CategoryRow(
+        categories: List<String>,
+        modifier: Modifier = Modifier
+    ) {
+        LazyRow(
+            modifier = modifier,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(categories) { category ->
+                CategoryChip(label = category)
+            }
+        }
+    }
+
+
+    // écran d'accueil de base ------------------
     @Composable
     fun ProductHomeScreen(
         featuredProduct: ProductUi,
@@ -221,7 +322,8 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-// Offre du jour page d'accueil
+
+    // Offre du jour page d'accueil
     @Composable
     fun DailyOfferBox(
         modifier: Modifier = Modifier
@@ -546,5 +648,51 @@ fun sampleProductOutOfStock(): ProductUi {
         stock = 0,
         warrantyInformation = "Garantie constructeur : 1 an",
         shippingInformation = "Produit temporairement indisponible"
+    )
+}
+
+// renvoie une liste de produits
+fun sampleProducts(): List<ProductUi> {
+    return listOf(
+        sampleProduct(),
+        ProductUi(
+            id = 2,
+            title = "Casque Audio Pulse",
+            brand = "SoundPeak",
+            category = "Audio",
+            description = "Un casque confortable pour écouter de la musique et travailler dans de bonnes conditions.",
+            price = 129.99,
+            discountPercentage = 8.0,
+            rating = 4.2,
+            stock = 0,
+            warrantyInformation = "Garantie constructeur : 1 an",
+            shippingInformation = "Produit temporairement indisponible"
+        ),
+        ProductUi(
+            id = 3,
+            title = "Montre Connectée FitTime",
+            brand = "FitTime",
+            category = "Wearables",
+            description = "Une montre connectée simple pour suivre l’activité quotidienne.",
+            price = 89.99,
+            discountPercentage = 15.0,
+            rating = 4.4,
+            stock = 18,
+            warrantyInformation = "Garantie constructeur : 2 ans",
+            shippingInformation = "Livraison estimée : 2 à 4 jours ouvrés"
+        ),
+        ProductUi(
+            id = 4,
+            title = "Enceinte Mini Boom",
+            brand = "BoomSound",
+            category = "Audio",
+            description = "Une enceinte compacte pour écouter de la musique à la maison ou en déplacement.",
+            price = 59.99,
+            discountPercentage = 5.0,
+            rating = 4.1,
+            stock = 52,
+            warrantyInformation = "Garantie constructeur : 1 an",
+            shippingInformation = "Livraison estimée : 3 jours ouvrés"
+        )
     )
 }
