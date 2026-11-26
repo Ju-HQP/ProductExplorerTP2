@@ -30,6 +30,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -79,6 +84,18 @@ class MainActivity : ComponentActivity() {
         onProductClick: (ProductUi) -> Unit,
         modifier: Modifier = Modifier
     ) {
+        // variable texte de recherche modulable
+        var searchQuery by rememberSaveable() {
+            mutableStateOf("")
+        }
+        // méthode de filtrage de recherche (contenu dans le titre, la marque ou la catégorie)
+        val filteredProducts = remember(products, searchQuery) {
+            products.filter { product ->
+                product.title.contains(searchQuery, ignoreCase = true) ||
+                        product.brand.contains(searchQuery, ignoreCase = true) ||
+                        product.category.contains(searchQuery, ignoreCase = true)
+            }
+        }
         LazyColumn(
             modifier = modifier
                 .fillMaxSize()
@@ -99,14 +116,28 @@ class MainActivity : ComponentActivity() {
             item {
                 Text(
                     text = "Explorez une sélection de produits disponibles localement.",
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+            }
+            item {
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = { newValue ->
+                        searchQuery = newValue
+                    },
+                    label = {
+                        Text(text = "Rechercher un produit")
+                    },
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
             item {
                 CategoryRow(categories = sampleCategories())
             }
             items(
-                items = products,
+                // filteredProducts est la liste des produits filtrés déclarés plus haut
+                items = filteredProducts,
                 key = { product -> product.id }
             ) { product ->
                 ProductListItem(
@@ -634,7 +665,7 @@ class MainActivity : ComponentActivity() {
             )
         }
     }*/
-    
+
     // PREVIEW LIGHT MODE
     @Preview(
         showBackground = true,
