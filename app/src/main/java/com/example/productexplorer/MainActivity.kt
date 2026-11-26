@@ -105,6 +105,18 @@ class MainActivity : ComponentActivity() {
                 matchesSearch && matchesStock
             }
         }
+        // gestion favoris
+        var favoriteProductIds by rememberSaveable {
+            mutableStateOf(listOf<Int>())
+        }
+        // fonction d'ajout/suppression de favoris
+        fun toggleFavorite(productId: Int) {
+            favoriteProductIds = if (favoriteProductIds.contains(productId)) {
+                favoriteProductIds - productId
+            } else {
+                favoriteProductIds + productId
+            }
+        }
         LazyColumn(
             modifier = modifier
                 .fillMaxSize()
@@ -173,6 +185,10 @@ class MainActivity : ComponentActivity() {
             ) { product ->
                 ProductListItem(
                     product = product,
+                    isFavorite = favoriteProductIds.contains(product.id),// vérifie la liste des favoris actuelles
+                    onFavoriteClick = {
+                        toggleFavorite(product.id)
+                    },
                     onClick = {
                         onProductClick(product)
                     }
@@ -185,6 +201,8 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun ProductListItem(
         product: ProductUi,
+        isFavorite: Boolean,
+        onFavoriteClick: () -> Unit,
         onClick: () -> Unit,
         modifier: Modifier = Modifier
     ) {
@@ -220,6 +238,15 @@ class MainActivity : ComponentActivity() {
                 Spacer(modifier = Modifier.height(8.dp))
                 Button(onClick = onClick) {
                     Text(text = "Voir le produit")
+                }
+                Button(onClick = onFavoriteClick) {
+                    Text(
+                        text = if (isFavorite) {
+                            "Retirer des favoris"
+                        } else {
+                            "Ajouter aux favoris"
+                        }
+                    )
                 }
             }
         }
