@@ -1,6 +1,5 @@
 package com.example.productexplorer
 
-import android.media.Image
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -17,27 +16,24 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.productexplorer.ui.theme.ProductExplorerTheme
-import java.util.function.IntConsumer
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
-import androidx.compose.runtime.produceState
-import androidx.compose.ui.Alignment
-import androidx.compose.foundation.lazy.items // corrige l'erruer no value passed for parameter count
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -93,6 +89,16 @@ class MainActivity : ComponentActivity() {
                     text = "Catalogue produits",
                     style = MaterialTheme.typography.headlineMedium
                 )
+            }
+            // affichage des catégories
+            item {
+                Text(
+                    text = "Explorez une sélection de produits disponibles localement.",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+            item {
+                CategoryRow(categories = sampleCategories())
             }
             items(
                 items = products,
@@ -593,6 +599,17 @@ class MainActivity : ComponentActivity() {
             ProductDetailScreen(
                 product = sampleProductOutOfStock(),
                 onAddToCartClick = {}
+            )
+        }
+    }
+
+    @Preview(showBackground = true)
+    @Composable
+    fun ProductCatalogScreenPreview() {
+        ProductExplorerTheme {
+            ProductCatalogScreen(
+                products = sampleProducts(),
+                onProductClick = {}
             )
         }
     }
