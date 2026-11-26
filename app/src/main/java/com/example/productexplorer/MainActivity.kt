@@ -88,12 +88,21 @@ class MainActivity : ComponentActivity() {
         var searchQuery by rememberSaveable() {
             mutableStateOf("")
         }
+        var showOnlyInStock by rememberSaveable {
+            // valeur en paramètre = valeur par défaut
+            mutableStateOf(false)
+        }
         // méthode de filtrage de recherche (contenu dans le titre, la marque ou la catégorie)
-        val filteredProducts = remember(products, searchQuery) {
+        val filteredProducts = remember(products, searchQuery, showOnlyInStock) {
             products.filter { product ->
-                product.title.contains(searchQuery, ignoreCase = true) ||
-                        product.brand.contains(searchQuery, ignoreCase = true) ||
-                        product.category.contains(searchQuery, ignoreCase = true)
+                val matchesSearch =
+                    product.title.contains(searchQuery, ignoreCase = true) ||
+                            product.brand.contains(searchQuery, ignoreCase = true) ||
+                            product.category.contains(searchQuery, ignoreCase = true)
+                val matchesStock =
+                    !showOnlyInStock || product.stock > 0
+                        // verif recherche par nom et dispo
+                matchesSearch && matchesStock
             }
         }
         LazyColumn(
@@ -130,6 +139,28 @@ class MainActivity : ComponentActivity() {
                         Text(text = "Rechercher un produit")
                     },
                     modifier = Modifier.fillMaxWidth()
+                )
+            }
+            item {
+                Button(
+                    onClick = {
+                        showOnlyInStock = !showOnlyInStock
+                    }
+                ) {
+                    Text(
+                        text = if (showOnlyInStock) {
+                            "Afficher tous les produits"
+                        } else {
+                            "Afficher uniquement les produits en stock"
+                        }
+                    )
+                }
+            }
+            // Affiche le nombre de produits return par la recherche
+            item {
+                Text(
+                    text = "${filteredProducts.size} produit(s) affiché(s)",
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
             item {
