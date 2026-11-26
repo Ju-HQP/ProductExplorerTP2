@@ -63,8 +63,9 @@ class MainActivity : ComponentActivity() {
 //                        },
 //                        modifier = Modifier.padding(innerPadding)
 //                    )
-                    ProductCatalogScreen(
-                        products = sampleProducts(),// liste de produits
+                    ProductCatalogContainer(
+                        products = sampleProducts(),
+                        categories = sampleCategories(),
                         onProductClick = {
 // Plus tard : ouvrir le détail du produit
                         },
@@ -77,10 +78,17 @@ class MainActivity : ComponentActivity() {
 
     // CATALOGUE ---------------
 
-    // écran de catalogue
+    // gestion d'état de l'affichage du catalogue
+    /*conserve la recherche
+       conserve le filtre stock
+      conserve les favoris
+      calcule la liste filtrée
+      COMPOSANT DIT "stateful"
+      */
     @Composable
-    fun ProductCatalogScreen(
+    fun ProductCatalogContainer(
         products: List<ProductUi>,
+        categories: List<String>,
         onProductClick: (ProductUi) -> Unit,
         modifier: Modifier = Modifier
     ) {
@@ -92,6 +100,10 @@ class MainActivity : ComponentActivity() {
             // valeur en paramètre = valeur par défaut
             mutableStateOf(false)
         }
+        // gestion favoris
+        var favoriteProductIds by rememberSaveable {
+            mutableStateOf(listOf<Int>())
+        }
         // méthode de filtrage de recherche (contenu dans le titre, la marque ou la catégorie)
         val filteredProducts = remember(products, searchQuery, showOnlyInStock) {
             products.filter { product ->
@@ -101,14 +113,11 @@ class MainActivity : ComponentActivity() {
                             product.category.contains(searchQuery, ignoreCase = true)
                 val matchesStock =
                     !showOnlyInStock || product.stock > 0
-                        // verif recherche par nom et dispo
+                // verif recherche par nom et dispo
                 matchesSearch && matchesStock
             }
         }
-        // gestion favoris
-        var favoriteProductIds by rememberSaveable {
-            mutableStateOf(listOf<Int>())
-        }
+
         // fonction d'ajout/suppression de favoris
         fun toggleFavorite(productId: Int) {
             favoriteProductIds = if (favoriteProductIds.contains(productId)) {
@@ -117,6 +126,41 @@ class MainActivity : ComponentActivity() {
                 favoriteProductIds + productId
             }
         }
+        ProductCatalogScreen(
+            products = filteredProducts,
+            categories = categories,
+            searchQuery = searchQuery,
+            onSearchQueryChange = { newValue ->
+                searchQuery = newValue
+            },
+            showOnlyInStock = showOnlyInStock,
+            onToggleStockFilter = {
+                showOnlyInStock = !showOnlyInStock
+            },
+            favoriteProductIds = favoriteProductIds,
+            onFavoriteClick = { productId ->
+                toggleFavorite(productId)
+            },
+            onProductClick = onProductClick,
+            modifier = modifier
+        )
+    }
+
+    // écran de catalogue
+    // composant dit "stateless"
+    @Composable
+    fun ProductCatalogScreen(
+        products: List<ProductUi>,
+        categories: List<String>,
+        searchQuery: String,
+        onSearchQueryChange: (String) -> Unit,
+        showOnlyInStock: Boolean,
+        onToggleStockFilter: () -> Unit,
+        favoriteProductIds: List<Int>,
+        onFavoriteClick: (Int) -> Unit,
+        onProductClick: (ProductUi) -> Unit,
+        modifier: Modifier = Modifier
+    ) {
         LazyColumn(
             modifier = modifier
                 .fillMaxSize()
@@ -144,9 +188,7 @@ class MainActivity : ComponentActivity() {
             item {
                 OutlinedTextField(
                     value = searchQuery,
-                    onValueChange = { newValue ->
-                        searchQuery = newValue
-                    },
+                    onValueChange = onSearchQueryChange,
                     label = {
                         Text(text = "Rechercher un produit")
                     },
@@ -155,9 +197,7 @@ class MainActivity : ComponentActivity() {
             }
             item {
                 Button(
-                    onClick = {
-                        showOnlyInStock = !showOnlyInStock
-                    }
+                    onClick = onToggleStockFilter
                 ) {
                     Text(
                         text = if (showOnlyInStock) {
@@ -171,23 +211,23 @@ class MainActivity : ComponentActivity() {
             // Affiche le nombre de produits return par la recherche
             item {
                 Text(
-                    text = "${filteredProducts.size} produit(s) affiché(s)",
+                    text = "${products.size} produit(s) affiché(s)",
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
             item {
-                CategoryRow(categories = sampleCategories())
+                CategoryRow(categories = categories)
             }
             items(
                 // filteredProducts est la liste des produits filtrés déclarés plus haut
-                items = filteredProducts,
+                items = products,
                 key = { product -> product.id }
             ) { product ->
                 ProductListItem(
                     product = product,
                     isFavorite = favoriteProductIds.contains(product.id),// vérifie la liste des favoris actuelles
                     onFavoriteClick = {
-                        toggleFavorite(product.id)
+                        onFavoriteClick(product.id)
                     },
                     onClick = {
                         onProductClick(product)
@@ -732,8 +772,9 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun ProductCatalogScreenLightPreview() {
         ProductExplorerTheme(darkTheme = false) {
-            ProductCatalogScreen(
+            ProductCatalogContainer(
                 products = sampleProducts(),
+                categories = sampleCategories(),
                 onProductClick = {}
             )
         }
@@ -748,8 +789,28 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun ProductCatalogScreenDarkPreview() {
         ProductExplorerTheme(darkTheme = true) {
+            ProductCatalogContainer(
+                products = sampleProducts(),
+                categories = sampleCategories(),
+                onProductClick = {}
+            )
+        }
+    }
+
+    // PREVIEW Catalogue Stateless
+    @Preview(showBackground = true)
+    @Composable
+    fun ProductCatalogScreenStatelessPreview() {
+        ProductExplorerTheme {
             ProductCatalogScreen(
                 products = sampleProducts(),
+                categories = sampleCategories(),
+                searchQuery = "",
+                onSearchQueryChange = {},
+                showOnlyInStock = false,
+                onToggleStockFilter = {},
+                favoriteProductIds = listOf(1),
+                onFavoriteClick = {},
                 onProductClick = {}
             )
         }
