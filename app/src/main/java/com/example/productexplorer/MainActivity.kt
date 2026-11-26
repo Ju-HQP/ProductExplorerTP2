@@ -314,13 +314,16 @@ class MainActivity : ComponentActivity() {
     ) {
         Surface(
             modifier = modifier,
-            shape = MaterialTheme.shapes.medium,
-            tonalElevation = 2.dp
+            shape = MaterialTheme.shapes.extraLarge,
+            // couleur de fond
+            color = MaterialTheme.colorScheme.secondary,
+            // couleur de contenu
+            contentColor = MaterialTheme.colorScheme.onPrimary
         ) {
             Text(
                 text = label,
-                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                style = MaterialTheme.typography.bodyMedium
+                modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+                style = MaterialTheme.typography.labelLarge
             )
         }
     }
